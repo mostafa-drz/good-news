@@ -1,20 +1,35 @@
-import AWS, { Comprehend } from 'aws-sdk';
-const comprehand = new Comprehend({
-  apiVersion: '2017-11-27',
-  region: 'ca-central-1'
-});
-const isItPositive = async (title: string) => {
-  const params = {
-    LanguageCode: 'en',
-    TextList: [title]
-  };
+import express, { NextFunction, Response, Request } from 'express';
+import Sentiment from './services/Sentiment';
+import bodyParser from 'body-parser';
+const app = express();
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+const PORT = process.env.PORT || 3000;
 
-  comprehand.batchDetectSentiment(params, (error, data) => {
-    if (error) {
-      console.error('something is not happy', error);
-    } else {
-      console.log('All I know is', data);
-      console.log(data.ResultList[0].SentimentScore);
+app.get('/api/ping', (req, res) => {
+  res.status(200).send('Pong');
+});
+app.post(
+  '/api/sentiment',
+  async (req: Request, resp: Response, next: NextFunction) => {
+    const { texts } = req.body;
+    const sentiment = new Sentiment(texts);
+    try {
+      const scores = await sentiment.getSentimentScore();
+      resp.status(200).send(scores);
+    } catch (error) {
+      next(error);
     }
-  });
-};
+  }
+);
+
+app.use(function (req, res, next) {
+  res.status(404).send('Sorry:( what are you looking for?');
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send('Oops! something not working!');
+});
+
+app.listen(PORT);
