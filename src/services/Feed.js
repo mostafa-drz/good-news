@@ -6,7 +6,7 @@ const getFeed = (url) => {
     const results = [];
     const feedparser = new FeedParser();
     feedparser.on('end', function () {
-      resolve(results);
+      console.log(results);
     });
     feedparser.on('error', function (error) {
       reject(error);
