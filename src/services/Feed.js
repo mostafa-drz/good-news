@@ -1,12 +1,16 @@
 import fetch, { Response } from 'node-fetch'; // for fetching the feed
 const FeedParser = require('feedparser');
 
-const getFeed = (url) => {
+const getFeed = (url, cb) => {
   return new Promise((resolve, reject) => {
     const results = [];
     const feedparser = new FeedParser();
     feedparser.on('end', function () {
-      console.log(results);
+      if (cb) {
+        cb(results);
+      } else {
+        return resolve(results);
+      }
     });
     feedparser.on('error', function (error) {
       reject(error);

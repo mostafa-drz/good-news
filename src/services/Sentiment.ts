@@ -6,7 +6,7 @@ class Sentiment {
   constructor(texts: string[]) {
     this.comprehand = new Comprehend({
       apiVersion: '2017-11-27',
-      region: 'ca-central-1'
+      region: process.env.AWS_REGION
     });
     this.params = {
       LanguageCode: 'en',
