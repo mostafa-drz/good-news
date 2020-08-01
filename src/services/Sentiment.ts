@@ -1,5 +1,4 @@
 import { Comprehend } from 'aws-sdk';
-import {} from 'aws-sdk/';
 
 class Sentiment {
   private comprehand: Comprehend;

@@ -20,8 +20,11 @@
   "license": "ISC",
   "dependencies": {
     "@types/express": "^4.17.7",
+    "@types/node-fetch": "^2.5.7",
     "aws-sdk": "^2.724.0",
     "express": "^4.17.1",
+    "feedparser": "^2.2.10",
+    "node-fetch": "^2.6.0",
     "ts-node-dev": "^1.0.0-pre.56",
     "typescript": "^3.9.7"
   },

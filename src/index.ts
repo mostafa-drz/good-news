@@ -1,6 +1,8 @@
 import express, { NextFunction, Response, Request } from 'express';
 import Sentiment from './services/Sentiment';
 import bodyParser from 'body-parser';
+import getFeed from './services/Feed';
+
 const app = express();
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -20,6 +22,14 @@ app.post(
     } catch (error) {
       next(error);
     }
+  }
+);
+app.get(
+  '/api/rss-sentiment',
+  async (req: Request, resp: Response, next: NextFunction) => {
+    const { url } = req.body;
+    const results = await getFeed(url);
+    resp.status(200).send(results);
   }
 );
 
