@@ -12,6 +12,7 @@ const start = () => {
   try {
     feeder.start();
     analyzer.start();
+    console.log(`The App is running 🚀`);
   } catch (error) {
     console.error(error);
   }
