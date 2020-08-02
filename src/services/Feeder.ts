@@ -9,7 +9,7 @@ const SQS = new AWS.SQS({
   region: process.env.AWS_REGION || 'ca-central-1'
 });
 
-interface FeedItem {
+export interface FeedItem {
   title?: string;
   description?: string;
   summary?: string;
