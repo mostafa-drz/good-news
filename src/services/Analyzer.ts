@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk';
-import cron from 'node-cron';
 import { FeedItem } from './Feeder';
 
 const SQS = new AWS.SQS({
@@ -16,8 +15,11 @@ const docClient = new AWS.DynamoDB.DocumentClient({
 });
 
 class Analyzer {
+  private readonly INTERVAL = 60000;
   public start(): void {
-    cron.schedule('* * * * *', this.poll.bind(this), {});
+    setInterval(() => {
+      this.poll();
+    }, this.INTERVAL);
   }
   private poll(): void {
     const params: AWS.SQS.ReceiveMessageRequest = {
