@@ -1,18 +1,20 @@
-import App from './server';
 import Feeder from './services/Feeder';
 import dotenv from 'dotenv';
 import Analyzer from './services/Analyzer';
+import { checkConfig } from './utils';
 
 dotenv.config();
-const PORT = process.env.PORT || 3000;
 
 const start = () => {
-  App.listen(PORT, () => {
-    console.log(`Server is running on PORT ${PORT} 🚀`);
-  });
-  // Feeder.start();
+  checkConfig();
+  const feeder = new Feeder();
   const analyzer = new Analyzer();
-  analyzer.start();
+  try {
+    feeder.start();
+    analyzer.start();
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 start();

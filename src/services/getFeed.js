@@ -1,4 +1,4 @@
-import fetch, { Response } from 'node-fetch'; // for fetching the feed
+import fetch from 'node-fetch'; // for fetching the feed
 const FeedParser = require('feedparser');
 
 const getFeed = (url, cb) => {
@@ -22,8 +22,19 @@ const getFeed = (url, cb) => {
       var item;
 
       while ((item = stream.read())) {
-        const { title, description, summary, data, link, guid } = item;
-        results.push({ title, description, summary, data, link, guid });
+        const { title, description, summary, date, link, guid, meta } = item;
+        results.push({
+          title,
+          description,
+          summary,
+          date,
+          link,
+          guid,
+          meta,
+          source_title: meta.title,
+          source_description: meta.description,
+          source_link: meta.link
+        });
       }
     });
     fetch(url).then(

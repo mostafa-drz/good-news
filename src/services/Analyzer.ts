@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk';
-import { FeedItem } from './Feeder';
+import Feed, { FeedItem } from './Feed';
 
 const SQS = new AWS.SQS({
   apiVersion: '2012-11-05',
@@ -15,11 +15,10 @@ const docClient = new AWS.DynamoDB.DocumentClient({
 });
 
 class Analyzer {
-  private readonly INTERVAL = 60000;
   public start(): void {
     setInterval(() => {
       this.poll();
-    }, this.INTERVAL);
+    }, Number(process.env.AWS_SQS_POLLING_INTERVAL));
   }
   private poll(): void {
     const params: AWS.SQS.ReceiveMessageRequest = {
@@ -45,38 +44,36 @@ class Analyzer {
     if (data.Messages) {
       data.Messages.forEach(async (message: AWS.SQS.Message) => {
         const { Body } = message;
-        let feed: FeedItem = {};
+        let feed: FeedItem | undefined = undefined;
         if (Body) {
           try {
-            feed = JSON.parse(Body);
+            feed = new Feed(JSON.parse(Body));
           } catch (error) {
             //not a valid json
             this.deleteMessage(message);
           }
-          this.getSentimentScore([
-            feed.title || '',
-            feed.summary || '',
-            feed.description || ''
-          ])
-            .then(this.getOverAll)
+          if (typeof feed === undefined) {
+            return false;
+          }
+          this.getSentimentScore(feed as Feed)
             .then((r) => {
-              this.recordResult(r, feed, message);
+              this.recordResult(feed as Feed, message);
             })
             .then(() => this.deleteMessage(message))
             .then(() => {
-              console.log('done', feed.guid);
+              console.log('done', feed?.guid);
             });
         }
       });
     }
   }
 
-  private getSentimentScore(
-    texts: string[]
-  ): Promise<{
-    results: AWS.Comprehend.ListOfDetectSentimentResult;
-    texts: string[];
-  }> {
+  private getSentimentScore(feed: FeedItem): Promise<any> {
+    const texts = [
+      feed.title || '',
+      feed.description || '',
+      feed.summary || ''
+    ];
     const params = {
       LanguageCode: 'en',
       TextList: Array.from(new Set(texts))
@@ -86,66 +83,27 @@ class Analyzer {
         if (error) {
           return reject(error);
         } else {
-          return resolve({ results: data.ResultList, texts });
+          feed.sentimentResults = data.ResultList.map(
+            (result: AWS.Comprehend.BatchDetectSentimentItemResult, index) => ({
+              ...result,
+              text: texts[index]
+            })
+          );
+          return resolve();
         }
       });
     });
   }
-
-  private getOverAll({
-    results,
-    texts
-  }: {
-    results: AWS.Comprehend.BatchDetectSentimentItemResult[];
-    texts: string[];
-  }): Result {
-    const overAllPositive = results.reduce((sum, result) => {
-      if (result?.SentimentScore?.Positive) {
-        return sum + result?.SentimentScore?.Positive;
-      }
-      return sum;
-    }, 0);
-    const overAllNegative = results.reduce((sum, result) => {
-      if (result?.SentimentScore?.Negative) {
-        return sum + result?.SentimentScore?.Negative;
-      }
-      return sum;
-    }, 0);
-    const overAllNeutral = results.reduce((sum, result) => {
-      if (result?.SentimentScore?.Neutral) {
-        return sum + result?.SentimentScore?.Neutral;
-      }
-      return sum;
-    }, 0);
-    const overAllScore = {
-      Positive: overAllPositive,
-      Negative: overAllNegative,
-      Neutral: overAllNeutral
-    };
-    const overAllSentiment = getSentiment(overAllScore);
-    return {
-      overall: {
-        Sentiment: overAllSentiment,
-        SentimentScore: overAllScore
-      },
-      scores: results.map((result, index) => ({
-        text: texts[index],
-        SentimentScore: result.SentimentScore || {},
-        Sentiment: (result.Sentiment || '') as Sentiment
-      }))
-    };
-  }
-
   private recordResult(
-    result: Result,
     feed: FeedItem,
     sqsMessage: AWS.SQS.Message
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       const feedResult = {
         id: sqsMessage.MessageId,
+        Sentiment: feed?.overAllScore?.overall?.Sentiment,
         ...feed,
-        ...result.overall
+        ...feed.overAllScore
       };
       const tableName = process.env.AWS_RESULTS_TABLE as string;
       const params = {
@@ -178,38 +136,4 @@ class Analyzer {
   }
 }
 
-interface Result {
-  overall: {
-    Sentiment: AWS.Comprehend.SentimentType;
-    SentimentScore: AWS.Comprehend.SentimentScore;
-  };
-  scores: {
-    text: string;
-    SentimentScore: AWS.Comprehend.SentimentScore;
-    Sentiment: Sentiment;
-  }[];
-}
-
-enum Sentiment {
-  POSITIVE = 'POSITIVE',
-  NEGATIVE = 'NEGATIVE',
-  NEUTRAL = 'NEUTRAL'
-}
-
-const getSentiment = (
-  score: AWS.Comprehend.SentimentScore
-): AWS.Comprehend.SentimentType => {
-  const MAX = Math.max(
-    score.Negative || 0,
-    score.Positive || 0,
-    score.Neutral || 0
-  );
-  if (MAX === score.Negative) {
-    return Sentiment.NEGATIVE;
-  } else if (MAX === score.Positive) {
-    return Sentiment.POSITIVE;
-  } else {
-    return Sentiment.NEUTRAL;
-  }
-};
 export default Analyzer;
