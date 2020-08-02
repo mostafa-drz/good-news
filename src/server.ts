@@ -1,5 +1,4 @@
 import express, { NextFunction, Response, Request } from 'express';
-import Sentiment from './services/Sentiment';
 import bodyParser from 'body-parser';
 import getFeed from './services/Feed';
 
@@ -10,19 +9,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.get('/api/ping', (req, res) => {
   res.status(200).send('Pong');
 });
-app.post(
-  '/api/sentiment',
-  async (req: Request, resp: Response, next: NextFunction) => {
-    const { texts } = req.body;
-    const sentiment = new Sentiment(texts);
-    try {
-      const scores = await sentiment.getSentimentScore();
-      resp.status(200).send(scores);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
+
 app.get(
   '/api/rss-sentiment',
   async (req: Request, resp: Response, next: NextFunction) => {
