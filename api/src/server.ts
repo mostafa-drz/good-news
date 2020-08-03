@@ -6,7 +6,7 @@ import { CustomError } from './types';
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
-app.use(router);
+router(app);
 app.use((req: Request, res: Response, next) => {
   const err: CustomError = new Error('Not Found');
   err['status'] = 404;
