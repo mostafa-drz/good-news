@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import express from 'express';
-const app = express();
-const PORT = process.env.PORT || 3000;
+import { startServer } from './server';
 
-app.listen(PORT, () => {
-  console.log(`API server is running on ${PORT} `);
-});
+const start = (): void => {
+  startServer();
+};
+
+start();
