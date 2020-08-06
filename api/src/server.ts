@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import { CustomError } from './types';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.use(bodyParser.json());
 router(app);
 app.use((req: Request, res: Response, next) => {
