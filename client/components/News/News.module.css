@@ -1,0 +1,30 @@
+.News {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 900px;
+  position: relative;
+  border: 1px solid #ccc;
+  margin: 1%;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+.content {
+  padding: 1%;
+}
+.news-footer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #fafafa;
+  padding-top: 1%;
+  align-items: flex-end;
+}
+.source-title {
+  width: 300px;
+  font-size: 0.7rem;
+  text-align: left;
+}
+
+.news-score {
+  display: flex;
+}
