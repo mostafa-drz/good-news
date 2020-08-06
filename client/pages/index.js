@@ -24,7 +24,7 @@ export default function Home(props) {
 
 export async function getServerSideProps(context) {
   const resp = await fetch(
-    "http://localhost:3001/api/results?Sentiment=POSITIVE"
+    `${process.env.API_URL}/api/results?Sentiment=POSITIVE`
   );
   const data = await resp.json();
   return {
