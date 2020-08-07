@@ -2,6 +2,7 @@ import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import fetch from "node-fetch";
 import News from "../components/News";
+import Navbar from "../components/Navbar";
 
 export default function Home(props) {
   const { data, count } = props;
@@ -12,7 +13,9 @@ export default function Home(props) {
         <title>The Good News is</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
+      <headr>
+        <Navbar />
+      </headr>
       <main className={styles.main}>
         <h1 className={styles.title}>Welcome to The Good News is</h1>
         <h2>count:{count}</h2>
