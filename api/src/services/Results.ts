@@ -47,10 +47,11 @@ class Results {
     sentiment?: Sentiment
   ): Promise<AWS.DynamoDB.DocumentClient.ItemList | undefined | Error> {
     return new Promise((resolve, reject) => {
-      const params = {
+      const params: AWS.DynamoDB.DocumentClient.QueryInput = {
         TableName: process.env.AWS_RESULTS_TABLE as string,
         KeyConditionExpression: '#Sentiment = :Sentiment',
         IndexName: 'Sentiment-date-index',
+        ScanIndexForward: false,
         ProjectionExpression:
           'summary, Sentiment, overAllScore,source_title, #date, link, id, title',
         ExpressionAttributeValues: { ':Sentiment': sentiment },
