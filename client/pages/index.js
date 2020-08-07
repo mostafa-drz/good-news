@@ -5,20 +5,28 @@ import News from "../components/News";
 import Navbar from "../components/Navbar";
 
 export default function Home(props) {
-  const { data, count } = props;
+  const { data } = props;
 
   return (
     <div className={styles.container}>
       <Head>
         <title>The Good News is</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1"
+        ></meta>
       </Head>
       <headr>
         <Navbar />
       </headr>
-      <main className={styles.main}>
-        <h1 className={styles.title}>Welcome to The Good News is</h1>
-        <h2>count:{count}</h2>
+      <main
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         {data && data.map((d) => <News {...d} key={d.id} />)}
       </main>
     </div>

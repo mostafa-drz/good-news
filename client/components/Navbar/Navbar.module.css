@@ -3,6 +3,10 @@
   flex-direction: row;
   justify-content: space-between;
   list-style: none;
+  width: 600px;
+  margin: auto;
+  margin-top: 5%;
+  margin-bottom: 5%;
 }
 
 .link {
