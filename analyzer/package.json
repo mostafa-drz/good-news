@@ -22,7 +22,7 @@
     "@types/express": "^4.17.7",
     "@types/node-cron": "^2.0.3",
     "@types/node-fetch": "^2.5.7",
-    "aws-sdk": "^2.724.0",
+    "aws-sdk": "^2.814.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "feedparser": "^2.2.10",
