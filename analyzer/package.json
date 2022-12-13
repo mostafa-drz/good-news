@@ -24,7 +24,7 @@
     "@types/node-fetch": "^2.5.7",
     "aws-sdk": "^2.724.0",
     "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "feedparser": "^2.2.10",
     "node-cron": "^2.0.3",
     "node-fetch": "^2.6.0",
